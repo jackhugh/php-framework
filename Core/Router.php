@@ -12,16 +12,13 @@ class Router {
 		static::$routes[] = $route;
 	}
 
-	public static function middleware(Middleware $middleware) {
+	public static function middleware(string $middleware) {
 		static::$middleware[] = $middleware;
 	}
 
 	public static function dispatch(string $method, string $url) {
 
-		// create req and response. 
-
-
-		// try {
+		try {
 			foreach (static::$routes as $route) {
 				if ($method === $route->httpMethod) {
 					if (preg_match_all($route->regex, $url, $matches, PREG_SET_ORDER)) {
@@ -31,14 +28,13 @@ class Router {
 						foreach ($route->params as $key => $param) {
 							$params[$param] = $matches[$key];
 						}
+						
 						$request = new Request($method, $url, $params);
 						$response = new Response($route->responseType);
+
 						foreach (static::$middleware as $middleware) {
-							$middleware->run($request, $response);
+							($middleware)::run($request, $response);
 						}
-						// print_r($route);
-						// print_r($request);
-						// print_r($response);
 	
 						$controller = new ($route->controller)();
 						$controller->{$route->controllerMethod}($request, $response);
@@ -49,9 +45,13 @@ class Router {
 			}
 			throw new HTTPException(404);
 
-		// } catch (\Throwable $e) {
-			// $e::class === HTTPException::class ? throw $e : throw new HTTPException(500);
-		// }
+		} catch (HTTPException $e) {
+			// $error = new Error();
+		} catch (\Throwable $t) {
+			if (false) {
+				throw $t;
+			}
+		}
 
 
 	}

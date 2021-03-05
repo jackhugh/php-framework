@@ -2,15 +2,14 @@
 
 namespace App\Controllers;
 
+use Core\View;
+
 class Homepage {
 	public function index($req, $resp) {
-		$resp->body = 123;
+		$resp->body = "root";
 	}
 	public function user($req, $resp) {
-		print_r($req);
-		print_r($resp);
+		$resp->body = View::render("user.phtml", ['user' => $req->params->user]);
 	}
-	public function test($req, $resp) {
-		$resp->body = [1,2,3,4];
-	}
+
 }

@@ -17,6 +17,11 @@ class Response {
 
 	}
 
+	public function redirect(string $location) {
+		header("location: $location");
+		die;
+	}
+
 	public function send() {
 		foreach ($this->headers as $header => $value) {
 			header("$header: $value");
