@@ -9,7 +9,7 @@ use Core\Response;
 
 class Authenticated implements Middleware {
 	public static function run(Request $req, Response $resp) {
-		if (false) {
+		if (true) {
 			throw new HTTPException(401);
 		}
 	}

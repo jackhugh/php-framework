@@ -8,13 +8,17 @@ class Response {
 	public array $headers = [];
 	public $body;
 
-	public function __construct(string $type = "html") {
-		$this->type = $type;
-		$this->headers['content-type'] = match ($type) {
+	public function __construct(?Route $route = null) {
+		$this->type = $route?->type ?? "html";
+		$this->headers['content-type'] = match ($this->type) {
 			"html" => "text/html",
 			"json" => "application/json"
 		};
 
+	}
+
+	public function responseCode($code) {
+		http_response_code($code);
 	}
 
 	public function redirect(string $location) {

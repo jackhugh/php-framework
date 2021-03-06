@@ -2,14 +2,17 @@
 
 namespace App\Controllers;
 
+use Core\Controller;
 use Core\View;
+use Exception;
 
-class Homepage {
-	public function index($req, $resp) {
-		$resp->body = "root";
+class Homepage extends Controller{
+
+	public function user() {
+		$this->response->body = View::render("user.phtml", ['user' => $this->request->params->user]);
 	}
-	public function user($req, $resp) {
-		$resp->body = View::render("user.phtml", ['user' => $req->params->user]);
+	public function test() {
+		throw new Exception();
 	}
 
 }

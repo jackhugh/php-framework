@@ -3,56 +3,54 @@
 namespace Core;
 
 use Core\Exception\HTTPException;
+use Exception;
 
 class Router {
-	public static array $routes = [];
-	public static array $middleware = [];
 
-	public static function register(Route $route) {
-		static::$routes[] = $route;
+	public static array $routers = [];
+
+	public array $routes = [];
+
+	public function __construct() {
+		static::$routers[] = $this;
 	}
 
-	public static function middleware(string $middleware) {
-		static::$middleware[] = $middleware;
+	public function addRoute(Route $route) {
+		$this->routes[] = $route;
+	}
+	public function addMiddleware(Middleware $middleware) {
 	}
 
 	public static function dispatch(string $method, string $url) {
+		
+		$request = new Request($method, $url);
+		$response = null;
 
 		try {
-			foreach (static::$routes as $route) {
-				if ($method === $route->httpMethod) {
-					if (preg_match_all($route->regex, $url, $matches, PREG_SET_ORDER)) {
-						$matches = $matches[0];
-						array_shift($matches);
-						$params = [];
-						foreach ($route->params as $key => $param) {
-							$params[$param] = $matches[$key];
-						}
-						
-						$request = new Request($method, $url, $params);
-						$response = new Response($route->responseType);
+			foreach (static::$routers as $router) {
+				foreach ($router->routes as $route) {
+					
+					if ($route->match($request)) {
+						$response = new Response($route);
 
-						foreach (static::$middleware as $middleware) {
-							($middleware)::run($request, $response);
-						}
-	
-						$controller = new ($route->controller)();
-						$controller->{$route->controllerMethod}($request, $response);
+						$controllerClass = $route->controller;
+						$controllerMethod = $route->controllerMethod;
+
+						$controller = new $controllerClass($request, $response);
+						$controller->$controllerMethod();
 						$response->send();
 						return;
 					}
 				}
 			}
+			// We haven't found the route, create 404.
 			throw new HTTPException(404);
-
-		} catch (HTTPException $e) {
-			// $error = new Error();
-		} catch (\Throwable $t) {
-			if (false) {
-				throw $t;
-			}
+		
+		} catch (Exception $e) {
+			$response ??= new Response();
+			$error = new ErrorController($request, $response);
+			$error->handleException($e);
+			$response->send();
 		}
-
-
 	}
 }
