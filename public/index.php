@@ -15,4 +15,4 @@ $routes->addMiddleware(new TestHeader());
 
 $headRoutes->addRoute(new Route("GET", "/", Homepage::class, "root"));
 
-$routes->dispatch($_SERVER['REQUEST_METHOD'], parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+Router::dispatch($_SERVER['REQUEST_METHOD'], parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
