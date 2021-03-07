@@ -12,7 +12,7 @@ class Route {
 		public string $route,
 		public string $controller,
 		public string $controllerMethod,
-		public string $responseType = "html"
+		public string $type = "html"
 
 	) {
 		$regex = $this->route;

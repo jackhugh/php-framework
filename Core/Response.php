@@ -8,13 +8,16 @@ class Response {
 	public array $headers = [];
 	public $body;
 
-	public function __construct(?Route $route = null) {
-		$this->type = $route?->type ?? "html";
-		$this->headers['content-type'] = match ($this->type) {
-			"html" => "text/html",
-			"json" => "application/json"
-		};
+	public function __construct() {
+		$this->setType("html");
+	}
 
+	public function setType(string $type) {
+		$this->headers['content-type'] = match ($type) {
+			'html' => 'text/html',
+			'json' => 'application/json',
+		};
+		$this->type = $type;
 	}
 
 	public function responseCode($code) {

@@ -2,8 +2,9 @@
 
 namespace Core;
 
+use App\Config;
 use Core\Exception\HTTPException;
-use Exception;
+use Throwable;
 
 class ErrorController extends Controller {
 
@@ -19,10 +20,9 @@ class ErrorController extends Controller {
 		];
 	}
 
-	public function handleException(Exception $e) {
-
+	public function handleException(Throwable $e) {
 		if ($e::class !== HTTPException::class) {
-			if ($_ENV['ENVIRONMENT'] === "dev") {
+			if (Config::ENV === "dev") {
 				// We are in a dev environment and this is not an HTTP exception, re-throw the exception.
 				throw $e;
 

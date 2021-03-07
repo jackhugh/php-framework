@@ -7,8 +7,6 @@ class Controller {
 	public function __construct(
 		public Request $request,
 		public Response $response
-	) {
-		
-	}
+	) {}
 	
 }

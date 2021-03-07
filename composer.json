@@ -6,10 +6,7 @@
             "email": "24830612+jackhugh@users.noreply.github.com"
         }
     ],
-    "require": {
-        "vlucas/phpdotenv": "^5.3"
-    },
-	"autoload": {
+    "autoload": {
         "psr-4": {
 			"": ""
 		}
