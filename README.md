@@ -6,7 +6,7 @@ An implementation of a basic MVC php framework.
 
 The router class maps the requested HTTP method and path to a controller method. The `addRoute` method takes an instantiated `Route` as an argument.
 ```php
-// public/index.php
+// App/routes.php
 
 $router = new Router();
 
@@ -36,7 +36,7 @@ class CustomHeader implements Middleware {
 	}
 }
 
-// public/index.php
+// App/routes.php
 
 $router->addMiddleware(new CustomHeader());
 ```
@@ -46,3 +46,5 @@ $router->addMiddleware(new CustomHeader());
 ## Request
 
 ## Response
+
+## HTTPException

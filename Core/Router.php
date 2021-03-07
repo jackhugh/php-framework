@@ -2,15 +2,17 @@
 
 namespace Core;
 
+use App\Controllers\ErrorController;
 use Core\Exception\HTTPException;
 use Throwable;
 
 class Router {
 
-	public static array $routers = [];
+	private static array $routers = [];
+	
+	private array $routes = [];
 
-	public array $routes = [];
-	public array $middleware = [];
+	use MiddlewareTrait;
 
 	public function __construct() {
 		static::$routers[] = $this;
@@ -19,53 +21,49 @@ class Router {
 	public function addRoute(Route $route) {
 		$this->routes[] = $route;
 	}
-	
-	public function addMiddleware(Middleware $middleware) {
-		$this->middleware[] = $middleware;
+
+	private function dispatchRouter(Request $req, Response $resp) {
+		foreach ($this->routes as $route) {
+			// We have matched a route.
+			if ($route->match($req)) {
+
+				$resp->setType($route->type);
+
+				// Run all router middleware.
+				$this->runMiddleware($req, $resp);
+				// Run all controller specific middleware.
+				$route->runMiddleware($req, $resp);
+
+				// Create controller instance and run route method.
+				$controllerClass = $route->controller;
+				$controllerMethod = $route->controllerMethod;
+				
+				$controller = new $controllerClass($req, $resp);
+				$controller->$controllerMethod();
+
+				// Route is found, break out of the loop.
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static function dispatch(string $method, string $url) {
-		
 		$request = new Request($method, $url);
 		$response = new Response();
 
 		try {
-			foreach (static::$routers as $router) {
-				
-				foreach ($router->routes as $route) {
-
-					// We have matched a route.
-					if ($route->match($request)) {
-
-						$response->setType($route->type);
-
-						// Run all middlewares for this router.
-						foreach ($router->middleware as $middleware) {
-							$middleware->run($request, $response);
-						}
-
-						// Create controller instance and run route method.
-						$controllerClass = $route->controller;
-						$controllerMethod = $route->controllerMethod;
-						
-						$controller = new $controllerClass($request, $response);
-						$controller->$controllerMethod();
-
-						// Route is found, break out of the loop.
-						return;
-					}
-				}
+			$matched = false;
+			foreach(static::$routers as $router) {
+				$matched = $router->dispatchRouter($request, $response);
+				if ($matched) break;
 			}
-			// We haven't found the route, create 404.
-			throw new HTTPException(404);
-			
+			if (!$matched) throw new HTTPException(404);
+
 		} catch (Throwable $t) {
 			$error = new ErrorController($request, $response);
-			$error->handleException($t);
-			
-		} finally {
-			// FIXME this will stop dev errors from showing.
-			$response->send();
+			$error->handleException($t);		
 		}
+		$response->send();
 	}
 }

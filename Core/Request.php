@@ -6,14 +6,15 @@ use stdClass;
 
 class Request {
 	
-	public string $method;
-	public string $url;
 	public stdClass $params;
 	public stdClass $query;
 	public stdClass $body;
 	public stdClass $cookies;
 
-	public function __construct(string $method, string $url) {
+	public function __construct(
+		public string $method,
+		public string $url
+	) {
 		$this->method = $method;
 		$this->url = $url;
 		$this->query = (object) $_GET;

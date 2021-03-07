@@ -3,17 +3,18 @@
 namespace Core;
 
 class Route {
-
+	
 	public string $regex;
 	public array $params = [];
+	
+	use MiddlewareTrait;
 
 	public function __construct(
 		public string $httpMethod,
 		public string $route,
 		public string $controller,
 		public string $controllerMethod,
-		public string $type = "html"
-
+		public string $type = "html",
 	) {
 		$regex = $this->route;
 		$regex = preg_quote($regex, "/");
@@ -46,4 +47,5 @@ class Route {
 		}
 		$request->params = (object) $params;
 	}
+
 }

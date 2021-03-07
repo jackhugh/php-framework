@@ -1,18 +1,6 @@
 <?php
+declare(strict_types = 1);
 require_once __DIR__ . "/../vendor/autoload.php";
-
-use App\Controllers\Homepage;
-use App\Middleware\TestHeader;
-use Core\Router;
-use Core\Route;
-
-
-$routes = new Router();
-$headRoutes = new Router();
-
-$routes->addRoute(new Route("GET", "/profile/{user}", Homepage::class, "user"));
-$routes->addMiddleware(new TestHeader());
-
-$headRoutes->addRoute(new Route("GET", "/", Homepage::class, "root"));
-
-Router::dispatch($_SERVER['REQUEST_METHOD'], parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+require_once __DIR__ . "/../App/Routes.php";
+$dotenv = \Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
