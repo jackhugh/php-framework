@@ -2,8 +2,8 @@
 
 namespace Core;
 
-use App\Controllers\ErrorController;
 use Core\Exception\HTTPException;
+use \App\Controllers\Error;
 use Throwable;
 
 class Router {
@@ -39,7 +39,7 @@ class Router {
 				$controllerMethod = $route->controllerMethod;
 				
 				$controller = new $controllerClass($req, $resp);
-				$controller->$controllerMethod();
+				$resp->body = $controller->$controllerMethod();
 
 				// Route is found, break out of the loop.
 				return true;
@@ -49,21 +49,21 @@ class Router {
 	}
 
 	public static function dispatch(string $method, string $url) {
-		$request = new Request($method, $url);
-		$response = new Response();
+		$req = new Request($method, $url);
+		$resp = new Response();
 
 		try {
 			$matched = false;
 			foreach(static::$routers as $router) {
-				$matched = $router->dispatchRouter($request, $response);
+				$matched = $router->dispatchRouter($req, $resp);
 				if ($matched) break;
 			}
 			if (!$matched) throw new HTTPException(404);
 
 		} catch (Throwable $t) {
-			$error = new ErrorController($request, $response);
+			$error = new Error($req, $resp);
 			$error->handleException($t);		
 		}
-		$response->send();
+		$resp->send();
 	}
 }

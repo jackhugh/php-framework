@@ -21,5 +21,4 @@ class Request {
 		$this->post = (object) $_POST;
 		$this->cookies = (object) $_COOKIE;
 	}
-
 }

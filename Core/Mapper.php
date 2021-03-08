@@ -9,7 +9,7 @@ abstract class Mapper {
 	private static $staticDB;
 	protected $DB;
 
-	protected function getDB() {
+	private function getDB() {
 		$server = $_ENV['DB_HOST'];
 		$database = $_ENV['DB_NAME'];
 		$username = $_ENV['DB_USER'];

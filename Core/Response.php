@@ -6,6 +6,7 @@ class Response {
 
 	public string $type;
 	public array $headers = [];
+	public int $responseCode = 200;
 	public $body;
 
 	public function __construct() {
@@ -20,16 +21,15 @@ class Response {
 		$this->type = $type;
 	}
 
-	public function responseCode($code) {
-		http_response_code($code);
-	}
-
 	public function redirect(string $location) {
 		header("location: $location");
 		die;
 	}
 
 	public function send() {
+
+		http_response_code($this->responseCode);
+
 		foreach ($this->headers as $header => $value) {
 			header("$header: $value");
 		}

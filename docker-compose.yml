@@ -1,11 +1,11 @@
 version: "3.9"
 services:
-  app:
+  webserver:
     build:
       context: ./
       dockerfile: Dockerfile
-    image: php-framework-app
-    container_name: php-framework-app
+    image: php-framework-webserver
+    container_name: php-framework-webserver
     restart: unless-stopped
     working_dir: /var/www
     volumes:
@@ -15,33 +15,19 @@ services:
     networks:
       - php-framework
 
-  # mysql:
-  #   image: mysql:latest
-  #   container_name: twitch-mysql
-  #   restart: unless-stopped
-  #   environment:
-  #     MYSQL_DATABASE: ${DB_DATABASE}
-  #     MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-  #     MYSQL_PASSWORD: ${DB_PASSWORD}
-  #     MYSQL_USER: ${DB_USERNAME}
-  #   volumes:
-  #     - ./docker-compose/mysql:/docker-entrypoint-initdb.d
-  #   networks:
-  #     - twitch
-
-
-  # phpmyadmin:
-  #   image: phpmyadmin
-  #   container_name: twitch-phpmyadmin
-  #   restart: unless-stopped
-  #   ports:
-  #     - 8081:80
-  #   volumes:
-  #   - ./docker-compose/phpmyadmin/phpMyAdmin-main:/var/www/html/themes/phpMyAdmin-main
-  #   environment:
-  #     PMA_HOST: mysql
-  #   networks:
-  #     - twitch
+  mysql:
+    image: mysql:latest
+    container_name: php-framework-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - 3306:3306
+    networks:
+      - php-framework
 
 networks:
   php-framework:

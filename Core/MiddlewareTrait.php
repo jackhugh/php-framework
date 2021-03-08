@@ -3,7 +3,7 @@
 namespace Core;
 
 trait MiddlewareTrait {
-
+	
 	protected array $middleware = [];
 
 	public function addMiddleware(Middleware $middleware) {

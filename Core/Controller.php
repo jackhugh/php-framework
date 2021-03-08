@@ -5,8 +5,8 @@ namespace Core;
 class Controller {
 	
 	public function __construct(
-		public Request $request,
-		public Response $response
+		protected Request $request,
+		protected Response $response
 	) {}
 	
 }
