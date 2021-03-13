@@ -3,6 +3,7 @@
 namespace Core;
 
 use BadMethodCallException;
+use stdClass;
 
 class Route {
 	
@@ -14,8 +15,7 @@ class Route {
 	public function __construct(
 		public string $httpMethod,
 		public string $route,
-		public string $controller,
-		public string $controllerMethod,
+		public stdClass $controller,
 		public string $type = "html",
 	) {
 		$regex = $this->route;

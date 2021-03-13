@@ -10,7 +10,7 @@ use Throwable;
 class Error extends Controller {
 
 	private function page(int $code, string $msg) {
-		$this->response->body = View::render("error.phtml", ['code' => $code, 'msg' => $msg]);
+		$this->response->body = View::render("error.phtml", compact('code', 'msg'));
 	}
 
 	private function api(int $code, string $msg) {
@@ -40,12 +40,17 @@ class Error extends Controller {
 			}
 		}
 
-		$this->response->responseCode = $e->getCode();
+		$messages = include __DIR__ . "/../config/HTTPResponses.php";
+
+		$code = $e->getCode();
+		$msg = $e->getMessage() ?: $messages[$code] ?? "";
+
+		$this->response->responseCode = $code;
 
 		if ($this->response->type === "html") {
-			$this->page($e->getCode(), $e->getMessage());
+			$this->page($code, $msg);
 		} else {
-			$this->api($e->getCode(), $e->getMessage());
+			$this->api($code, $msg);
 		}
 	}
 }
