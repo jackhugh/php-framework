@@ -10,19 +10,19 @@ class Response {
 	public $body;
 
 	public function __construct() {
-		$this->setType("html");
+		$this->setType("HTML");
 	}
 
 	public function setType(string $type) {
-		$this->headers['content-type'] = match ($type) {
-			'html' => 'text/html',
-			'json' => 'application/json',
+		$this->headers['Content-Type'] = match ($type) {
+			'HTML' => 'text/html',
+			'JSON' => 'application/json',
 		};
 		$this->type = $type;
 	}
 
 	public function redirect(string $location) {
-		header("location: $location");
+		header("Location: $location");
 		die;
 	}
 
@@ -33,7 +33,7 @@ class Response {
 		foreach ($this->headers as $header => $value) {
 			header("$header: $value");
 		}
-		if ($this->type === "json") {
+		if ($this->type === "JSON") {
 			$this->body = json_encode($this->body);
 		}
 		echo $this->body;

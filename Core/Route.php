@@ -7,25 +7,36 @@ use stdClass;
 
 class Route {
 	
+	use HasMiddleware;
+	use RouteVerbs;
+
 	public string $regex;
 	public array $params = [];
 	
-	use HasMiddleware;
-	use RouteVerbs;
 	
 	public function __construct(
 		public string $verb,
 		public string $route,
 		public stdClass $controller,
-		public string $type = "html",
+		public string $type,
 	) {
 		$regex = $this->route;
+
+		// Escape route for regex.
 		$regex = preg_quote($regex, "/");
+
+		// Find all route parameters.
 		$regex = preg_replace_callback("/\\\{(.+?)\\\}/", function($matches) {
-			$param = $matches[1];
-			$this->params[] = $param;
+			
+			// Store the param name for recalling later.
+			$this->params[] = $matches[1];
+			
+			// Replace with regex for matching request route.
 			return "(.+?)";
+
 		}, $regex);
+
+		// Enclose final regex ready for use.
 		$this->regex = "/^$regex$/";
 	}
 

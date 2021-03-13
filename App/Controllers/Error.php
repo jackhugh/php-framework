@@ -47,7 +47,7 @@ class Error extends Controller {
 
 		$this->response->responseCode = $code;
 
-		if ($this->response->type === "html") {
+		if ($this->response->type === "HTML") {
 			$this->page($code, $msg);
 		} else {
 			$this->api($code, $msg);
