@@ -2,7 +2,7 @@
 
 namespace Core;
 
-trait MiddlewareTrait {
+trait HasMiddleware {
 	
 	protected array $middleware = [];
 

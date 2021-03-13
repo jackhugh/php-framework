@@ -2,12 +2,14 @@
 
 namespace Core;
 
+use BadMethodCallException;
+
 class Route {
 	
 	public string $regex;
 	public array $params = [];
 	
-	use MiddlewareTrait;
+	use HasMiddleware;
 
 	public function __construct(
 		public string $httpMethod,
@@ -24,6 +26,21 @@ class Route {
 			return "(.+?)";
 		}, $regex);
 		$this->regex = "/^$regex$/";
+	}
+
+	public static function __callStatic($name, $arguments) {
+		$validVerbs = [
+			'GET',
+			'POST',
+			'DELETE',
+			'PUT',
+			'PATCH'
+		];
+		if (in_array($name, $validVerbs)) {
+			return new static($name, ...$arguments);
+		} else {
+			throw new BadMethodCallException("Invalid HTTP Verb");
+		}
 	}
 
 	public function match(Request $request) {

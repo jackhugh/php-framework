@@ -8,8 +8,9 @@ use App\Middleware\TestHeader;
 
 $router = new Router();
 
-$router->addRoute(new Route("GET", "/profile/{user}", Homepage::class, "user"));
-$router->addRoute(new Route("GET", "/api/{user}", Homepage::class, "test", "json"));
+$router->addRoute(Route::GET("/", Homepage::class, "homepage"));
+$router->addRoute(Route::GET("/profile/{user}", Homepage::class, "user"));
+$router->addRoute(Route::GET("/api/{user}", Homepage::class, "test", "json"));
 
 $router->addMiddleware(new TestHeader());
 

@@ -8,11 +8,13 @@ use Throwable;
 
 class Router {
 
+	use HasMiddleware;
+	use HasStaticMiddleware;
+	
 	private static array $routers = [];
 	
 	private array $routes = [];
 
-	use MiddlewareTrait;
 
 	public function __construct() {
 		static::$routers[] = $this;
@@ -51,6 +53,8 @@ class Router {
 	public static function dispatch(string $method, string $url) {
 		$req = new Request($method, $url);
 		$resp = new Response();
+
+		static::runStaticMiddleware($req, $resp);
 
 		try {
 			$matched = false;
