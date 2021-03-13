@@ -9,8 +9,6 @@ use Core\Response;
 
 class Authenticated implements Middleware {
 	public function run(Request $req, Response $resp) {
-		if (true) {
-			throw new HTTPException(401);
-		}
+		if ($req->params->user !== "jack") throw new HTTPException(401);
 	}
 }

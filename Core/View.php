@@ -4,7 +4,16 @@ namespace Core;
 
 class View {
 	
-	public static function render(string $file, array $params = [], bool $sanetize = true) {
+	/**
+	 * Returns pure HTML with values injected and sanetized.
+	 * 
+	 * @param string $file File relative to App/views.
+	 * @param array $params Values to be injected indexed by variable name.
+	 * @param bool $sanetize Whether or not to sanetize values (using 'htmlentities()') , default is true.
+	 * 
+	 * @return string
+	 */
+	public static function render(string $file, array $params = [], bool $sanetize = true): string {
 		extract($params);
 		ob_start();
 		include __DIR__ . "/../App/views/" . $file;
