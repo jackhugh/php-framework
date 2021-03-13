@@ -2,7 +2,7 @@
 
 namespace Core;
 
-use BadMethodCallException;
+use ErrorException;
 use stdClass;
 
 class Route {
@@ -11,9 +11,10 @@ class Route {
 	public array $params = [];
 	
 	use HasMiddleware;
-
+	use RouteVerbs;
+	
 	public function __construct(
-		public string $httpMethod,
+		public string $verb,
 		public string $route,
 		public stdClass $controller,
 		public string $type = "html",
@@ -28,24 +29,9 @@ class Route {
 		$this->regex = "/^$regex$/";
 	}
 
-	public static function __callStatic($name, $arguments) {
-		$validVerbs = [
-			'GET',
-			'POST',
-			'DELETE',
-			'PUT',
-			'PATCH'
-		];
-		if (in_array($name, $validVerbs)) {
-			return new static($name, ...$arguments);
-		} else {
-			throw new BadMethodCallException("Invalid HTTP Verb");
-		}
-	}
-
-	public function match(Request $request) {
+	public function match(Request $request): bool {
 		if (
-			$this->httpMethod === $request->method &&
+			$this->verb === $request->method &&
 			preg_match_all($this->regex, $request->url, $matches, PREG_SET_ORDER)
 		) {
 			$this->setParams($matches, $request);

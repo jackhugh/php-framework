@@ -2,29 +2,23 @@
 
 namespace Core;
 
-use BadMethodCallException;
-use InvalidArgumentException;
+use ErrorException;
 
-class Controller {
+abstract class Controller {
 	
 	public function __construct(
 		protected Request $request,
 		protected Response $response
 	) {}
 	
-	public static function __callStatic($name, $args) {
-
-		if ($name !== "method") return;
-
-		$args[0] ?? throw new InvalidArgumentException("No method name passed.");
-
-		if (method_exists(static::class, $args[0])) {
+	public static function method(string $methodName) {
+		if (method_exists(static::class, $methodName)) {
 			return (object) [
 				'class' => static::class,
-				'method' => $args[0]
+				'method' => $methodName
 			];
 		} else {
-			throw new BadMethodCallException("Controller method does not exist.");
+			throw new ErrorException("Controller method does not exist.");
 		}
 	}
 }
