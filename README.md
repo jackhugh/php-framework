@@ -10,25 +10,11 @@ The included docker-compose means you can get a web server up and running straig
 docker-compose up -d
 ```
 
-## Request and Response
+If you do not wish to use docker then you can just clone this repo and serve with your own web server.
 
-The request and response objects are core to the framework and are passed around to be accessed and mutated as needed.
+### PHP8
 
-### Request
-
-Request contains all important information about the current request.
-
-| Property        | Description                           |
-| --------------- | ------------------------------------- |
-| `$req->url`     | The current route relative to root.   |
-| `$req->method`  | HTTP method.                          |
-| `$req->params`  | All route parameters indexed by name. |
-| `$req->query`   | Shortcut to `(object) $_GET`.         |
-| `$req->post`    | Shortcut to `(object) $_POST`.        |
-| `$req->cookies` | Shortcut to `(object) $_COOKIE`.      |
-
-### Response
-
+This framework makes use of new php features such as constructor property promotion and match expressions; as such PHP8 is required.
 
 ## Router
 
@@ -83,6 +69,94 @@ Route paths can contain parameters by enclosing the parameter name in curly brac
 $route = Route::GET('/user/{username}', User::method('show'));
 ```
 
+## Request and Response
+
+The request and response objects are core to the framework and are passed around to be accessed and mutated as needed.
+
+### Request
+
+Request contains all important information about the current request.
+
+| Property            | Type     | Description                           |
+| ------------------- | -------- | ------------------------------------  |
+| `$request->url`     | string   | The current route relative to root.   |
+| `$request->method`  | string   | HTTP method.                          |
+| `$request->params`  | stdClass | All route parameters indexed by name. |
+| `$request->query`   | stdClass | Copy of `(object) $_GET`.             |
+| `$request->post`    | stdClass | Copy of `(object) $_POST`.            |
+| `$request->cookies` | stdClass | Copy of `(object) $_COOKIE`.          |
+
+### Response
+
+The response object contains several properties that can be set to change the response.
+
+| Property                  | Type   | Description                              |
+| ------------------------- | ------ | ---------------------------------------- |
+| `$response->type`         | string | Response type - default "HTML"           |
+| `$response->headers`      | array  | Array of headers indexed by header name. |
+| `$response->responseCode` | int    | Response code - default 200.             |
+| `$response->body`         | string | Response body.                           |
+
+#### Response methods
+
+Redirect to URL and terminate execution.
+```php
+$response->redirect(string $url);
+```
+
+Send response and terminate execution (This is done by automatically after the controller has finished).
+```php
+$response->send();
+```
+
+
+## Controller
+
+Controllers contain all of your core logic and can be created by extending `\Core\Controller`. Controllers are instantiated with `Request` and `Response` which can be mutated and are available as controller properties.
+
+```php
+// App\Controllers\User.php
+use \Core\Controller;
+
+class User extends Controller {
+	public function show() {
+		$data = [
+			'user' => $this->request->params->username
+		];
+		return View::render('user.phtml', $data);
+	}
+}
+```
+
+Any return value from the method will set the response body.
+
+By default routes are set to HTML which can be returned easily using `View::render`.
+
+If the route has been set to JSON then any data can be returned and will be automatically encoded using `json_encode`.
+
+## View
+
+View::render provides an easy way to sanetize and inject variables into templates and returns pure HTML.
+
+```php
+View::render(string $filename, array $data = [], bool $sanetize = true);
+```
+`$filename` should be relative to `App/views/` and `$data` contains an array of values indexed by variable name. By default it will sanetize all input according to `htmlentities()` but can be disabled by passing false as a third argument.
+```php
+$data = [
+	'username' => $this->request->params->username
+];
+View::render('user.phtml', $data);
+```
+```html
+/* App/views/user.phtml */
+<html>
+	<body>
+		User is <?= $username ?>
+	</body>
+</html>
+```
+
 ## Middleware
 
 Middleware can created by implementing `\Core\Middleware`. The necessary `Middleware::run` method is passed a `Request` and `Response` object which can be mutated before being passed onto the next middleware or finally controller. Alternatively this chain can be broken by invoking `Response::send`.
@@ -121,51 +195,10 @@ Added to an individual `Route`.
 $route->addMiddleware($middleware);
 ```
 
-## Controller
+## Exceptions
 
-Controllers contain all of your core logic and can be created by extending `\Core\Controller`. Controllers are instantiated with `Request` and `Response` which can be mutated and are available as controller properties.
+The router will automatically catch anything that extends `\Throwable` and pass onto `\App\Controllers\Error`.
 
-```php
-// App\Controllers\User.php
-use \Core\Controller;
+If the exception is not an HTTPException then it will evaluate whether `$ENV['ENVIRONMENT']` matches `dev` and if so rethrow the error and if not will rethrow it as an HTTPException(500).
 
-class User extends Controller {
-	public function show() {
-		$data = [
-			'user' => $this->request->params->username
-		];
-		return View::render('user.phtml', $data);
-	}
-}
-```
-
-By default the route defines that the controller method should return HTML. This can be done easily using `View::render`.
-
-If the route has been set to JSON then any data can be returned and will be automatically encoded using `json_encode`.
-
-## View
-
-View::render provides an easy way to sanetize and inject variables into templates and returns pure HTML.
-
-```php
-View::render(string $filename, array $data = [], bool $sanetize = true);
-```
-`$filename` should be relative to `App/views/` and `$data` contains an array of values indexed by variable name. By default it will sanetize all input according to `htmlentities()` but can be disabled by passing false as a third argument.
-```php
-$data = [
-	'username' => $this->request->params->username
-];
-View::render('user.phtml', $data);
-```
-```html
-/* App/views/user.phtml */
-<html>
-	<body>
-		User is <?= $username ?>
-	</body>
-</html>
-```
-
-
-
-## HTTPException
+The controller then generates an appropriate response based on the route.

@@ -5,7 +5,6 @@ use App\Controllers\Homepage;
 use App\Controllers\User;
 use App\Middleware\Authenticated;
 use App\Middleware\CustomHeader;
-use Core\Request;
 use Core\Route;
 use Core\Router;
 
