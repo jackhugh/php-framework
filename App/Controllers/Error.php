@@ -40,10 +40,8 @@ class Error extends Controller {
 			}
 		}
 
-		$messages = include __DIR__ . "/../config/HTTPResponses.php";
-
 		$code = $e->getCode();
-		$msg = $e->getMessage() ?: $messages[$code] ?? "";
+		$msg = $e->getMessage();
 
 		$this->response->responseCode = $code;
 

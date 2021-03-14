@@ -195,10 +195,19 @@ Added to an individual `Route`.
 $route->addMiddleware($middleware);
 ```
 
-## Exceptions
 
-The router will automatically catch anything that extends `\Throwable` and pass onto `\App\Controllers\Error`.
+## HTTPException
 
-If the exception is not an HTTPException then it will evaluate whether `$ENV['ENVIRONMENT']` matches `dev` and if so rethrow the error and if not will rethrow it as an HTTPException(500).
+An HTTPException can be thrown at any point in the script to generate an appropriate response for that route. If no message is given it will try to find a matching response for that HTTP code.
 
-The controller then generates an appropriate response based on the route.
+```php
+throw new \Core\Exceptions\HTTPException(401);
+```
+
+## Error Handling
+
+If exceptions are allowed to bubble up then the router will catch anything that extends `\Throwable` and pass onto `App\Controllers\Error` to handle.
+
+If the exception is not an HTTPException then it will evaluate whether `$ENV['ENVIRONMENT']` matches `dev`. If true it will rethrow the error, else it will generate an HTTPException(500).
+
+The controller then generates an appropriate response based on the route. If there is no route then a HTML response will be created.
