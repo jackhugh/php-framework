@@ -12,9 +12,9 @@ docker-compose up -d
 
 If you do not wish to use docker then you can just clone this repo and serve with your own web server.
 
-### PHP8
+### PHP 8
 
-This framework makes use of new php features such as constructor property promotion and match expressions; as such PHP8 is required.
+This framework makes use of new php features such as constructor property promotion and match expressions; as such PHP 8 is required.
 
 ## Router
 
@@ -75,7 +75,7 @@ The request and response objects are core to the framework and are passed around
 
 ### Request
 
-Request contains all important information about the current request.
+Request contains all the important information about the current request.
 
 | Property            | Type     | Description                           |
 | ------------------- | -------- | ------------------------------------  |
@@ -88,7 +88,7 @@ Request contains all important information about the current request.
 
 ### Response
 
-The response object contains several properties that can be set to change the response.
+Response contains several properties that can be mutated.
 
 | Property                  | Type   | Description                              |
 | ------------------------- | ------ | ---------------------------------------- |
@@ -128,9 +128,9 @@ class User extends Controller {
 }
 ```
 
-Any return value from the method will set the response body.
+The return value from the method will automatically set the response body.
 
-By default routes are set to HTML which can be returned easily using `View::render`.
+By default routes are set to HTML which can be rendered easily using `View::render`.
 
 If the route has been set to JSON then any data can be returned and will be automatically encoded using `json_encode`.
 
@@ -141,7 +141,8 @@ View::render provides an easy way to sanetize and inject variables into template
 ```php
 View::render(string $filename, array $data = [], bool $sanetize = true);
 ```
-`$filename` should be relative to `App/views/` and `$data` contains an array of values indexed by variable name. By default it will sanetize all input according to `htmlentities()` but can be disabled by passing false as a third argument.
+The `$filename` should be relative to `App/views/` and the `$data` array contains values indexed by variable name. By default it will sanetize all input according to `htmlentities()` but can be disabled by passing false as a third argument.
+
 ```php
 $data = [
 	'username' => $this->request->params->username
@@ -201,7 +202,7 @@ $route->addMiddleware($middleware);
 An HTTPException can be thrown at any point in the script to generate an appropriate response for that route. If no message is given it will try to find a matching response for that HTTP code.
 
 ```php
-throw new \Core\Exceptions\HTTPException(401);
+throw new \Core\Exceptions\HTTPException(401, "You are not authorized");
 ```
 
 ## Error Handling
@@ -210,4 +211,4 @@ If exceptions are allowed to bubble up then the router will catch anything that 
 
 If the exception is not an HTTPException then it will evaluate whether `$ENV['ENVIRONMENT']` matches `dev`. If true it will rethrow the error, else it will generate an HTTPException(500).
 
-The controller then generates an appropriate response based on the route. If there is no route then a HTML response will be created.
+The controller then generates a response based on the route type. If there is no route then a HTML response will be created. HTML responses use the `error.phtml` template.
