@@ -3,6 +3,7 @@
 An implementation of a basic MVC php framework, inspired by express and laravel.
 
 ## Table of Contents
+
 - [Installation](#installation)
 - [Router](#router)
 - [Route](#route)
@@ -88,8 +89,8 @@ The request and response objects are core to the framework and are passed around
 
 Request contains all the important information about the current request.
 
-| Property            | Type     | Description                           |
-| ------------------- | -------- | ------------------------------------  |
+| Name                | Type     | Description                           |
+| ------------------- | -------- | ------------------------------------- |
 | `$request->url`     | string   | The current route relative to root.   |
 | `$request->method`  | string   | HTTP method.                          |
 | `$request->params`  | stdClass | All route parameters indexed by name. |
@@ -101,25 +102,14 @@ Request contains all the important information about the current request.
 
 Response contains several properties that can be mutated.
 
-| Property                  | Type   | Description                              |
-| ------------------------- | ------ | ---------------------------------------- |
-| `$response->type`         | string | Response type - default "HTML"           |
-| `$response->headers`      | array  | Array of headers indexed by header name. |
-| `$response->responseCode` | int    | Response code - default 200.             |
-| `$response->body`         | string | Response body.                           |
-
-#### Response methods
-
-Redirect to URL and terminate execution.
-```php
-$response->redirect(string $url);
-```
-
-Send response and terminate execution (This is done by automatically after the controller has finished).
-```php
-$response->send();
-```
-
+| Name                               | Type   | Description                              |
+| ---------------------------------- | ------ | ---------------------------------------- |
+| `$response->type`                  | string | Response type - default "HTML"           |
+| `$response->headers`               | array  | Array of headers indexed by header name. |
+| `$response->responseCode`          | int    | Response code - default 200.             |
+| `$response->body`                  | string | Response body.                           |
+| `$response->redirect(string $url)` | method | Redirect to URL and terminate execution. |
+| `$response->send()`                | method | Send response and terminate execution.   |
 
 ## Controller
 
@@ -152,6 +142,7 @@ View::render provides an easy way to sanetize and inject variables into template
 ```php
 View::render(string $filename, array $data = [], bool $sanetize = true);
 ```
+
 The `$filename` should be relative to `App/views/` and the `$data` array contains values indexed by variable name. By default it will sanetize all input according to `htmlentities()` but can be disabled by passing false as a third argument.
 
 ```php
@@ -160,11 +151,13 @@ $data = [
 ];
 View::render('user.phtml', $data);
 ```
+
 ```html
 /* App/views/user.phtml */
 <html>
 	<body>
-		User is <?= $username ?>
+		User is
+		<?= $username ?>
 	</body>
 </html>
 ```
@@ -174,6 +167,7 @@ View::render('user.phtml', $data);
 Middleware can created by implementing `\Core\Middleware`. The necessary `Middleware::run` method is passed a `Request` and `Response` object which can be mutated before being passed onto the next middleware or finally controller. Alternatively this chain can be broken by invoking `Response::send`.
 
 An example middlware that adds a custom header to all responses.
+
 ```php
 // App/Middleware/CustomHeader.php
 use Core\Middleware;
@@ -193,20 +187,22 @@ Router::addStaticMiddleware(new CustomHeader());
 Middleware can be added in a number of ways.
 
 Added directly to `Router` - these are always run, even if a route cannot be found.
+
 ```php
 Router::addStaticMiddleware($middleware);
 ```
 
 Added to instances of `Router`.
+
 ```php
 $router->addMiddleware($middleware);
 ```
 
 Added to an individual `Route`.
+
 ```php
 $route->addMiddleware($middleware);
 ```
-
 
 ## HTTPException
 
