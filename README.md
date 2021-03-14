@@ -2,6 +2,17 @@
 
 An implementation of a basic MVC php framework, inspired by express and laravel.
 
+## Table of Contents
+- [Installation](#installation)
+- [Router](#router)
+- [Route](#route)
+- [Request and Response](#request-and-response)
+- [Controller](#controller)
+- [View](#view)
+- [Middleware](#middleware)
+- [HTTPException](#httpexception)
+- [Error Handling](#error-handling)
+
 ## Installation
 
 The included docker-compose means you can get a web server up and running straight away. Ports can be changed in `.env`.
