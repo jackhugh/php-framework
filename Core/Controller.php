@@ -3,6 +3,7 @@
 namespace Core;
 
 use ErrorException;
+use ReflectionMethod;
 
 abstract class Controller {
 	
@@ -12,11 +13,10 @@ abstract class Controller {
 	) {}
 	
 	public static function method(string $methodName) {
+
 		if (method_exists(static::class, $methodName)) {
-			return (object) [
-				'class' => static::class,
-				'method' => $methodName
-			];
+			return new ReflectionMethod(static::class, $methodName);
+			
 		} else {
 			throw new ErrorException("Controller method does not exist.");
 		}

@@ -2,8 +2,7 @@
 
 namespace Core;
 
-use ErrorException;
-use stdClass;
+use ReflectionMethod;
 
 class Route {
 	
@@ -17,8 +16,8 @@ class Route {
 	public function __construct(
 		public string $verb,
 		public string $route,
-		public stdClass $controller,
-		public string $type,
+		public ReflectionMethod $controller,
+		public string $type = "HTML",
 	) {
 		$regex = $this->route;
 

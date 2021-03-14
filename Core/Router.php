@@ -24,6 +24,7 @@ class Router {
 		$this->routes[] = $route;
 	}
 
+	// TODO - this method should just match a route and return that route. Then another function can run the route which should also be accessible publically.
 	private function dispatchRouter(Request $req, Response $resp) {
 		// Iterate all routes in this router.
 		foreach ($this->routes as $route) {
@@ -38,8 +39,8 @@ class Router {
 				$route->runMiddleware($req, $resp);
 
 				// Create controller instance and run route method.
+				$controllerMethod = $route->controller->name;
 				$controllerClass = $route->controller->class;
-				$controllerMethod = $route->controller->method;
 				
 				$controller = new $controllerClass($req, $resp);
 				$resp->body = $controller->$controllerMethod();
@@ -57,11 +58,11 @@ class Router {
 		$req = new Request($method, $url);
 		$resp = new Response();
 
-		// Run any globally registered middleware.
-		static::runStaticMiddleware($req, $resp);
-
-		// Iterate through all routers to find matching route.
 		try {
+			// Run any globally registered middleware.
+			static::runStaticMiddleware($req, $resp);
+
+			// Iterate through all routers to find matching route.
 			$matched = false;
 			foreach(static::$routers as $router) {
 				$matched = $router->dispatchRouter($req, $resp);
@@ -71,7 +72,7 @@ class Router {
 			if (!$matched) throw new HTTPException(404);
 
 		} catch (Throwable $t) {
-			// Let error controller handle exception according to environment.
+			// Let error controller handle exception depending on environment.
 			$error = new Error($req, $resp);
 			$error->handleException($t);		
 		}
